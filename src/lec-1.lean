@@ -21,4 +21,8 @@ import data.set.finite
 universes u
 variables (α : Type u)
 
+structure simple_graph (V : Type u) :=
+(adj : V → V → Prop)
+(sym : symmetric adj . obviously)
+(loopless : irreflexive adj . obviously)
 -- add more introductory stuff here
