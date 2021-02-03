@@ -46,11 +46,12 @@ def n_pos_list_check (n : ℕ) (l : list ℕ) : Prop := n ≤ l.pos_filter.lengt
 -- def nth_is_pos (n : ℕ) (l : list ℕ) [l.sorted (≤)] : Prop := 0 < (l.nth n)
 -- bad
 
-def sub_one_n_times (n : ℕ) (l : list ℕ) (h : l.sorted (≥)) : option (list ℕ) := if n ≤ (l.filter (λ n, 0 < n)).length then sub_one_n_times' n l else none
+def sub_one_n_times (n : ℕ) (l : list ℕ) (h : l.sorted (≥)) : option (list ℕ) := 
+  if n ≤ (l.filter (λ n, 0 < n)).length then some (sub_one_n_times' n l) else none
 
-def havel_hakimi' (l : list ℕ) (h : l.sorted (≥)) : option (list ℕ) := sub_one_n_times l.head l.tail h.tail
-
--- also need check for all 0's
+def havel_hakimi' (l : list ℕ) (h : l.sorted (≥)) : option (list ℕ) := 
+  if (l.filter (λ n, 0 < n)) = [] then some [] else sub_one_n_times l.head l.tail h.tail
+-- check again later
 
 -- ideas for degree sequence
   -- multiset of vertices, take the image
