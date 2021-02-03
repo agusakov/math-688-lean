@@ -22,9 +22,10 @@ nonnegative integers. The sequence is graphic iff the sequence
 
 import data.list.sort
 import combinatorics.simple_graph.basic
+import data.multiset.sort
 
 universe u
-variables (V : Type u)
+variables (V : Type u) [fintype V]
 
 -- what type should i use?
   -- `list.sorted` or `list.pairwise`
@@ -33,14 +34,44 @@ variables (V : Type u)
 -- oh god i need some kind of counter? or index
 -- copy over the sequence except erase largest element and 
   -- subtract one from the n next largest elements
-def sub_one_n_times (n : ℕ) (l : list ℕ) : list ℕ :=
+def sub_one_n_times' (n : ℕ) (l : list ℕ) : list ℕ :=
 (l.take n).map (nat.pred) ++ l.drop n
+-- this one works i think, but ordering does matter
+
+/-def list.pos_filter (l : list ℕ) : list ℕ := l.filter (λ n, 0 < n)
+-- this probably already exists, just don't feel like looking it up
+
+def n_pos_list_check (n : ℕ) (l : list ℕ) : Prop := n ≤ l.pos_filter.length-/
+
+-- def nth_is_pos (n : ℕ) (l : list ℕ) [l.sorted (≤)] : Prop := 0 < (l.nth n)
+-- bad
+
+def sub_one_n_times (n : ℕ) (l : list ℕ) (h : l.sorted (≥)) : option (list ℕ) := if n ≤ (l.filter (λ n, 0 < n)).length then sub_one_n_times' n l else none
+
+def havel_hakimi' (l : list ℕ) (h : l.sorted (≥)) : option (list ℕ) := sub_one_n_times l.head l.tail h.tail
+
+-- also need check for all 0's
+
+-- ideas for degree sequence
+  -- multiset of vertices, take the image
+  -- `multiset.sort` to get sorted list
+variables {V}
+
+def simple_graph.degree_multiset (G : simple_graph V) [decidable_rel G.adj] : multiset ℕ := finset.univ.val.map (λ v, G.degree v)
+
+def simple_graph.degree_sequence (G : simple_graph V) [decidable_rel G.adj] : list ℕ := (finset.univ.val.map (λ v, G.degree v)).sort (≥)
+
+variables (l : list ℕ) [l.sorted (≤)] 
 
 -- in pseudocode,
--- a sequence D is graphic if degree defines inj function from G to D
-  -- does this make sense
+-- a multiset ℕ is graphic if it is the degree sequence of some graph `G`
+def graphic (s : multiset ℕ) : Prop := ∃ (G : simple_graph V) [decidable_rel G.adj], by exactI s = G.degree_multiset
 
-variables (l : list ℕ) [l.sorted (≤)]  -- nICE
+-- a sorted list is graphic if blah blah
+def graphic' (l : list ℕ) [l.sorted (≤)] : Prop := ∃ (G : simple_graph V) [decidable_rel G.adj], by exactI l = G.degree_sequence
+
+
+
 variables (G : simple_graph V) [decidable_eq V] (v w x y : V) 
 variables (h1 : G.adj v w) (h2 : G.adj x y) (hn1 : ¬ G.adj v x) (hn2 : ¬ G.adj w y)
 
