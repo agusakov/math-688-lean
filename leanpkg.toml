@@ -1,8 +1,8 @@
 [package]
 name = "math-688-lean"
 version = "0.1"
-lean_version = "leanprover-community/lean:3.24.0"
+lean_version = "leanprover-community/lean:3.26.0"
 path = "src"
 
 [dependencies]
-mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "d6d4435e2ba18f8ba02a70ac66355123043ee110"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "e1ca806c5573891feb7aa262ea03cd789fb59004"}

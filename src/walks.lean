@@ -30,6 +30,9 @@ namespace simple_graph
 
 variables {V : Type u} (G : simple_graph V)
 
+-- lemma that says card of support is equal to length iff it's a path
+
+
 /-- A walk is a sequence of incident edges in a graph, represented here as a sequence of adjacent
 vertices. -/
 inductive walk : V → V → Type u
@@ -76,6 +79,11 @@ variables [decidable_eq V]
 def support : Π {u v : V}, G.walk u v → finset V
 | u v nil := {u}
 | u v (cons h p) := insert u p.support
+
+-- ?????
+def count (w : V) : Π {u v : V}, G.walk u v → ℕ
+| u v nil := if u = w ∨ v = w then 1 else 0
+| u v (cons h p) := if u = w then nat.succ (count p) else (count p)
 
 /-- A path is a walk that visits each vertex at most once. -/
 def is_path : Π {u v : V}, G.walk u v → Prop

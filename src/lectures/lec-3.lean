@@ -9,24 +9,19 @@ namespace simple_graph
 namespace walk
 
 variables {V : Type u} (G : simple_graph V)
-
-/-- A walk is a sequence of incident edges in a graph, represented here as a sequence of adjacent
-vertices. -/
-inductive walk' : V → V → Type u
-| nil {u : V} : walk' u u
-| cons {u v w : V} (h : G.adj u v) (p : walk' v w) : walk' u w
-
 variables [decidable_eq V] {G}
+
+def adj.to_edge {u v : V} (h : G.adj u v) : sym2 V := ⟦(u, v)⟧
 
 /-- The edge set of a walk is the finite set of edges it visits. -/
 def edge_set : Π {u v : V}, G.walk u v → finset (sym2 V)
 | u _ nil := ∅
-| u v (cons h p) := insert ⟦(u, v)⟧ p.edge_set
+| u v (cons h p) := insert (adj.to_edge h) p.edge_set
 
 /-- A trail is a walk that visits each edge at most once. -/
 def is_trail : Π {u v : V}, G.walk u v → Prop
 | u v nil := true
-| u v (cons h p) := p.is_trail ∧ ¬ ⟦(u, v)⟧ ∈ p.edge_set
+| u v (cons h p) := p.is_trail ∧ ¬ (adj.to_edge h) ∈ p.edge_set
 
 structure eulerian_circuit (v : V) :=
 (w : G.walk v v) 
@@ -54,10 +49,16 @@ begin
   exact G.incidence_set_subset v,
 end
 
-lemma cycle_even_outgoing_edges (G : simple_graph V) [inhabited V] (c : G.walk (default V) (default V)) :
-  ∀ (v : V), v ∈ c.support → even (finset.card ((G.incidence_set v) ∩ ↑(c.edge_set)).to_finset) :=
+
+-- basically need to show that, if there is some incoming edge to `v`, there is a corresponding outgoing edge from `v`
+lemma cycle_even_outgoing_edges (G : simple_graph V) [∀ (v : V), decidable_pred (G.incidence_set v)] (v : V)
+  (c : G.walk v v) (h : is_trail c) :
+  ∀ (w : V), w ∈ c.support → even (finset.card (c.edge_set.filter (G.incidence_set w))) := 
 begin
-  intros v vmem,
+  intros w vmem,
+  rw even,
+  -- need to show the existence of path from default V to v, and then different path from v to default V
+  -- and then show that the two edges incident with v are distinct?
   sorry,
 end
 
