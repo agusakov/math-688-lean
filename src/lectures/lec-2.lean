@@ -51,7 +51,12 @@ def sub_one_n_times (n : ℕ) (l : list ℕ) (h : l.sorted (≥)) : option (list
 
 def havel_hakimi' (l : list ℕ) (h : l.sorted (≥)) : option (list ℕ) := 
   if (l.filter (λ n, 0 < n)) = [] then some [] else sub_one_n_times l.head l.tail h.tail
--- check again later
+-- you can't get the empty list out of applying sub_one_n_times and removing the largest degree repeatedly, so when 
+  -- you get the empty list, you're done
+-- is there another way of doing it? is there something else i can return
+-- also need to re-sort
+
+def havel_hakimi_step (l : list ℕ) (h : l.sorted (≥)) : multiset ℕ := sub_one_n_times' l.head l.tail
 
 -- ideas for degree sequence
   -- multiset of vertices, take the image
@@ -60,18 +65,41 @@ variables {V}
 
 def simple_graph.degree_multiset (G : simple_graph V) [decidable_rel G.adj] : multiset ℕ := finset.univ.val.map (λ v, G.degree v)
 
-def simple_graph.degree_sequence (G : simple_graph V) [decidable_rel G.adj] : list ℕ := (finset.univ.val.map (λ v, G.degree v)).sort (≥)
+def simple_graph.degree_sequence (G : simple_graph V) [decidable_rel G.adj] : list ℕ := G.degree_multiset.sort (≥)
 
-variables (l : list ℕ) [l.sorted (≤)] 
+--variables (l : list ℕ) [l.sorted (≥)] 
 
 -- in pseudocode,
 -- a multiset ℕ is graphic if it is the degree sequence of some graph `G`
-def graphic (s : multiset ℕ) : Prop := ∃ (G : simple_graph V) [decidable_rel G.adj], by exactI s = G.degree_multiset
+def graphic' (s : multiset ℕ) : Prop := ∃ (G : simple_graph V) [decidable_rel G.adj], by exactI s = G.degree_multiset
 
 -- a sorted list is graphic if blah blah
-def graphic' (l : list ℕ) [l.sorted (≤)] : Prop := ∃ (G : simple_graph V) [decidable_rel G.adj], by exactI l = G.degree_sequence
+def graphic (l : list ℕ) : Prop := ∃ (n : ℕ) (G : simple_graph $ fin n) [decidable_rel G.adj], by exactI l = G.degree_sequence
 
+-- theorem statement from wikipedia:
+/-
+Let `S = (d_{1},\dots ,d_{n})` be a finite list of nonnegative integers that is nonincreasing. 
+List `S` is graphic if and only if the finite list `S' = (d_{2}-1,d_{3}-1,\dots ,d_{{d_{1}+1}}-1,d_{{d_{1}+2}},\dots ,d_{n})` 
+has nonnegative integers and is graphic.
+-/
+variables (S : list ℕ) (h : S.sorted (≥))
+-- variables (h₂ : S.head ≤ (S.filter (λ n, 0 < n)).length) -- this gives us nonnegative
+-- variables (h₃ : graphic ((havel_hakimi_step S h).sort (≥)))
 
+theorem havel_hakimi : graphic S ↔ (S.head ≤ (S.filter (λ n, 0 < n)).length) ∧ graphic ((havel_hakimi_step S h).sort (≥)) :=
+begin
+  split,
+  { intros h2, 
+    split,
+    { -- this is just the fact that S.head is largest degree, so the vertex with that degree is adjacent 
+      -- to S.head many vertices, which then means that they have degree at least 1
+      rcases h2 with ⟨n, G, hdec, hds⟩,
+      sorry },
+    { sorry } },
+  { intros h2,
+    rcases h2 with ⟨hnneg, n, G, hdec, hds⟩,
+    sorry },
+end
 
 variables (G : simple_graph V) [decidable_eq V] (v w x y : V) 
 variables (h1 : G.adj v w) (h2 : G.adj x y) (hn1 : ¬ G.adj v x) (hn2 : ¬ G.adj w y)
