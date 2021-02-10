@@ -66,6 +66,7 @@ variables {V}
 def simple_graph.degree_multiset (G : simple_graph V) [decidable_rel G.adj] : multiset ℕ := finset.univ.val.map (λ v, G.degree v)
 
 def simple_graph.degree_sequence (G : simple_graph V) [decidable_rel G.adj] : list ℕ := G.degree_multiset.sort (≥)
+-- test out definition - good for algebraic graph theory? - look through lecture notes
 
 --variables (l : list ℕ) [l.sorted (≥)] 
 
@@ -83,23 +84,33 @@ List `S` is graphic if and only if the finite list `S' = (d_{2}-1,d_{3}-1,\dots 
 has nonnegative integers and is graphic.
 -/
 variables (S : list ℕ) (h : S.sorted (≥))
--- variables (h₂ : S.head ≤ (S.filter (λ n, 0 < n)).length) -- this gives us nonnegative
--- variables (h₃ : graphic ((havel_hakimi_step S h).sort (≥)))
+
+def simple_graph.degree' (G : simple_graph V) [decidable_rel G.adj] : V → ℕ := λ v, G.degree v
+
+theorem havel_hakimi_A : graphic S → (S.head ≤ (S.filter (λ n, 0 < n)).length) ∧ graphic ((havel_hakimi_step S h).sort (≥)) :=
+begin
+  intros h2, 
+  split,
+  { -- this is just the fact that S.head is largest degree, so the vertex with that degree is adjacent 
+    -- to S.head many vertices, which then means that they have degree at least 1
+    rcases h2 with ⟨n, G, hdec, hds⟩,
+    have h3 : S.head = (@simple_graph.degree_sequence (fin n) _ G hdec).head,
+    exact congr_arg list.head hds,
+    let d1 := (@simple_graph.degree_sequence (fin n) _ G hdec).head,
+    -- let v1 := simple_graph.degree_multiset⁻¹ G d1, -- how do get to the preimage of the map in degree_multiset
+    sorry },
+  { sorry }, 
+end
+
+lemma havel_hakimi_B : (S.head ≤ (S.filter (λ n, 0 < n)).length) ∧ graphic ((havel_hakimi_step S h).sort (≥)) →  graphic S :=
+begin
+  intros h2,
+  rcases h2 with ⟨hnneg, n, G, hdec, hds⟩,
+  sorry,
+end
 
 theorem havel_hakimi : graphic S ↔ (S.head ≤ (S.filter (λ n, 0 < n)).length) ∧ graphic ((havel_hakimi_step S h).sort (≥)) :=
-begin
-  split,
-  { intros h2, 
-    split,
-    { -- this is just the fact that S.head is largest degree, so the vertex with that degree is adjacent 
-      -- to S.head many vertices, which then means that they have degree at least 1
-      rcases h2 with ⟨n, G, hdec, hds⟩,
-      sorry },
-    { sorry } },
-  { intros h2,
-    rcases h2 with ⟨hnneg, n, G, hdec, hds⟩,
-    sorry },
-end
+ ⟨havel_hakimi_A S h, havel_hakimi_B S h⟩
 
 variables (G : simple_graph V) [decidable_eq V] (v w x y : V) 
 variables (h1 : G.adj v w) (h2 : G.adj x y) (hn1 : ¬ G.adj v x) (hn2 : ¬ G.adj w y)
