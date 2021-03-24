@@ -18,7 +18,7 @@ import data.fintype.basic
 import data.sym2
 import data.set.finite
 
-universes u
+universes u v
 variables (α : Type u)
 
 structure simple_graph (V : Type u) :=
@@ -26,3 +26,33 @@ structure simple_graph (V : Type u) :=
 (sym : symmetric adj . obviously)
 (loopless : irreflexive adj . obviously)
 -- add more introductory stuff here
+
+structure graph (V : Type u) (E : Type v) :=
+(func : E → sym2 V)
+-- try finsum API
+
+-- V → E → ℕ, edges sum to 2
+-- V → list E
+structure graph2 (V : Type u) (E : Type v) :=
+(func : V → list E)
+/-
+Pros: 
+  * incidence between two edges `e f` is just `∃ (v : V), e ∈ func v ∧ f ∈ func v`
+Cons:
+  * neighborhood of vertex `v` is very awkward to define
+-/
+
+-- E → list V
+structure graph3 (V : Type u) (E : Type v) :=
+(func : E → list V)
+/-
+Pros:
+  * easy to do hypergraphs, digraphs, multigraphs from here
+  * similar to the definition from lecture
+  * incidence between two edges `e f` is just `func e ∩ func f ≠ ∅`
+Cons:
+  * undirected graphs need to be defined as quotient type i think? on ordering of list V
+  * neighborhood of vertex `v` very unwieldy, have to define it as union of `func e` over all 
+      `e` such that `v ∈ func e`
+  * what happens if you have empty list or list with one vertex? that shouldn't be allowed
+-/

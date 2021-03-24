@@ -66,10 +66,10 @@ begin
   sorry,
 end
 
-/-
+
 def incident (e f : sym2 V) : Prop := ∃ (v : V), v ∈ e ∧ v ∈ f
 
-def line_graph (G : simple_graph V) : simple_graph G.edge_set := 
+/-def line_graph (G : simple_graph V) : simple_graph G.edge_set := 
 { adj := λ e f, incident e f,
   sym := _,
   loopless := _ }-/

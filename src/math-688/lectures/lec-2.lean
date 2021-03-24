@@ -97,9 +97,10 @@ begin
     have h3 : S.head = (@simple_graph.degree_sequence (fin n) _ G hdec).head,
     exact congr_arg list.head hds,
     let d1 := (@simple_graph.degree_sequence (fin n) _ G hdec).head,
-    -- let v1 := simple_graph.degree_multiset⁻¹ G d1, -- how do get to the preimage of the map in degree_multiset
+    -- let v1 := simple_graph.degree_multiset⁻¹ G d1, -- how to get to the preimage of the map in degree_multiset
     sorry },
-  { sorry }, 
+  { -- the proof here is that performing the algorithm step is allowed because you can do the edge swap
+    sorry }, 
 end
 
 lemma havel_hakimi_B : (S.head ≤ (S.filter (λ n, 0 < n)).length) ∧ graphic ((havel_hakimi_step S h).sort (≥)) →  graphic S :=
